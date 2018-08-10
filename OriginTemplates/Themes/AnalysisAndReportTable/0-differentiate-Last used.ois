@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<Settings NodeID="0" Comment="" XF_Version_Num="1.1">Settings<node15 Label="Recalculate">2</node15><node65586 Label="Input">[Fulldata]L!(B,E"Normalized1")</node65586><node131122 Label="Derivative Order">1</node131122><node327730 Label="Savitzky-Golay Smooth">0</node327730><node393266 Label="Polynomial Order">2</node393266><node458802 Label="Points of Window">20</node458802><node196658 Label="Output">(&lt;input&gt;,&lt;new&gt;)</node196658><node262194 Label="Plot Derivative Curve">0</node262194><node14 Label="DSParam1">0</node14></Settings>

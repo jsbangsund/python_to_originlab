@@ -1,0 +1,6 @@
+﻿[Ver]
+33
+[WksPlotMenuMRUList]
+Version = 2
+1 = {"33248","","Scatter"}
+2 = {"0","run.section(Plot.ogs, UserPlot, ""C:\Users\JSB\Google Drive\Research\Templates\Origin\Origin2018_UserFiles\LT-ELPL-Lin.otp"" ""Untitled Category"")","LT-ELPL-Lin (Untitled Category)"}

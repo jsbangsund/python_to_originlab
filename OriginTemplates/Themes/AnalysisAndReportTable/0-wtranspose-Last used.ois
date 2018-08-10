@@ -1,0 +1,2 @@
+<?xml version="1.0"?>
+<Settings NodeID="0" Comment="" XF_Version_Num="2">Settings<node15 Label="Recalculate">0</node15><node65586 Label="Input Worksheet">[Book3]Sheet1</node65586><node131122 Label="Transpose from Selected Cell">0</node131122><node196658 Label="Exchange Label With Data">1</node196658><node262194 Label="Label Type">0</node262194><node327730 Label="Data">0</node327730><node458802 Label="Remove Ending Empty Rows and Columns">1</node458802><node393266 Label="Output Worksheet">&lt;input&gt;</node393266><node14 Label="DSParam1">0</node14></Settings>
