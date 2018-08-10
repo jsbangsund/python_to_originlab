@@ -9,4 +9,4 @@ OriginLab's default directory for user templates is (with appropriate version ye
 C:\Users\username\Documents\OriginLab\2016\User Files
 
 The function matplotlib_to_origin will try it's best to convert a matplotlib figure to an origin graph, extracting data and line properties from the figure and axis handles. It's by no means perfect, but allows for data to quickly be transferred from the python environment to OriginLab for further tweaking and sharing.
-![Example Origin Plot](/example.PNG)
+![Example Origin Plot](https://github.com/jsbangsund/python_to_originlab/blob/master/example.png)
