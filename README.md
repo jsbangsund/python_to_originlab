@@ -2,7 +2,7 @@
 ## Overview
 Functions in python to automate sending data and basic plotting functions in OriginLab. The function matplotlib_to_origin can convert matplotlib figures directly to origin graphs.
 
-The function matplotlib_to_origin will try it's best to convert a matplotlib figure to an origin graph, extracting data and line properties from the figure and axis handles. It's by no means perfect, but allows for data to quickly be transferred from the python environment to OriginLab for further tweaking and sharing.
+The function matplotlib_to_origin will try it's best to convert a matplotlib figure to an origin graph, extracting data and line properties from the figure and axis handles. It's by no means perfect, but allows for data to quickly be transferred from the python environment to OriginLab for further tweaking and sharing (with, e.g., advisors who demand you use Origin).
 ![Example Origin Plot](https://github.com/jsbangsund/python_to_originlab/blob/master/example.png)
 
 ## Dependencies
