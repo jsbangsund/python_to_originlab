@@ -18,7 +18,9 @@ C:\Users\username\Documents\OriginLab\2016\User Files
 
 ## Documentation
 OriginLab has fairly spotty documentation, but the two main documentation sources are for the Automation Server, and for LabTalk commands. LabTalk seems to be a much older and more thoroughly developed/documented language, so more complicated and specific commands can be achieved with this.
-https://www.originlab.com/doc/COM/Classes/ApplicationSI
+
+- [Automation Server Docs](https://www.originlab.com/doc/COM/Classes/ApplicationSI)
+- [LabTalk Docs](https://www.originlab.com/doc/LabTalk/guide)
 
 
 ## Other Resources
