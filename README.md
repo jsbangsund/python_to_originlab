@@ -16,5 +16,10 @@ There are a number of small syntax differences between versions. I have tested t
 OriginLab's default directory for user templates is (with appropriate version year selected):
 C:\Users\username\Documents\OriginLab\2016\User Files
 
+## Documentation
+OriginLab has fairly spotty documentation, but the two main documentation sources are for the Automation Server, and for LabTalk commands. LabTalk seems to be a much older and more thoroughly developed/documented language, so more complicated and specific commands can be achieved with this.
+https://www.originlab.com/doc/COM/Classes/ApplicationSI
+
+
 ## Other Resources
 https://github.com/swharden/PyOriginTools
