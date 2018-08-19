@@ -1,24 +1,10 @@
 import datetime
 import time
 import numpy as np
-import win32com.client
 import os
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
-
-try:
-    import OriginExt
-    app = OriginExt.Application()
-    origin_version = app.GetLTVar("@V")
-    # Origin 2015 9.2xn
-    # Origin 2016 9.3xn
-    # Origin 2017 9.4xn
-    # Origin 2018 >= 9.50n and < 9.55n
-    # Origin 2018b >= 9.55n
-    # Origin 2019 >= 9.60n and < 9.65n (Fall 2019)
-    # Origin 2019b >= 9.65n (Spring 2020)
-except:
-    print('OriginExt not installed, t')
+import OriginExt
 
 # Ideas for improvements:
 # - Compile line data (labels, format, color) into df
@@ -46,18 +32,24 @@ def matplotlib_to_origin(
     # If no origin session has been passed, start a new one
     if origin==None:
         # Connect to Origin client
-        origin = win32com.client.Dispatch("Origin.ApplicationSI")
-        # To open a new origin session (not overlap on current open session use:
-        # origin = win32com.client.Dispatch("Origin.Application")
-        # Make session visible
-        origin.Visible=1
+        origin = OriginExt.Application()
+        origin.Visible = origin.MAINWND_SHOW # Make session visible
         # Session can be later closed using origin.Exit()
         # Close previous project and make a new one
-        origin.NewProject
+        origin.NewProject()
         # Wait for origin to compile
         origin.Execute("sec -poc 3.5")
+    # Get origin version
+    # Origin 2015 9.2xn
+    # Origin 2016 9.3xn
+    # Origin 2017 9.4xn
+    # Origin 2018 >= 9.50n and < 9.55n
+    # Origin 2018b >= 9.55n
+    # Origin 2019 >= 9.60n and < 9.65n (Fall 2019)
+    # Origin 2019b >= 9.65n (Spring 2020)
+    origin_version = origin.GetLTVar("@V")
     # Create a workbook page
-    workbook= origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
+    workbook = origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
     # get workbook instance from name
     wb = origin.WorksheetPages(workbook)
     # Get worksheet instance, index starts at 0. Can add more worksheets with wb.Layers.Add
@@ -100,9 +92,9 @@ def matplotlib_to_origin(
         origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(line.get_ydata()).tolist(), 0, y_col_idx) # start row, start col
 
         # Tested only on origin 2016 and 2018
-        if origin_version<=2016:
+        if origin_version<9.5: # 2017 or older
             dr = origin.NewDataRange # Make a new datarange
-        elif origin_version>2016:
+        elif origin_version>=9.5: # 2018 or newer
             dr = origin.NewDataRange()
         # Add data to data range
         # Column type, worksheet, start row, start col, end row (-1=last), end col
