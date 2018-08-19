@@ -32,6 +32,7 @@ def matplotlib_to_origin(
     # If no origin session has been passed, start a new one
     if origin==None:
         # Connect to Origin client
+        # OriginExt.ApplicationSI() connects to current session if exists
         origin = OriginExt.Application()
         origin.Visible = origin.MAINWND_SHOW # Make session visible
         # Session can be later closed using origin.Exit()
@@ -48,6 +49,7 @@ def matplotlib_to_origin(
     # Origin 2019 >= 9.60n and < 9.65n (Fall 2019)
     # Origin 2019b >= 9.65n (Spring 2020)
     origin_version = origin.GetLTVar("@V")
+    print(origin_version)
     # Create a workbook page
     workbook = origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
     # get workbook instance from name
