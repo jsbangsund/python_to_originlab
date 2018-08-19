@@ -78,7 +78,6 @@ def matplotlib_to_origin(
         # Change column Units, Long Name, or Comments]
         col.LongName='X'
         col.Units='Unit'
-        col.Comments=''
         col.Type=3 # Set column data type to ( 0=Y, 3=X , ?=X error, ?=Y error)
         col=ws.Columns(y_col_idx)
         col.Type=0
