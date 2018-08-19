@@ -6,6 +6,20 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
+try:
+    import OriginExt
+    app = OriginExt.Application()
+    origin_version = app.GetLTVar("@V")
+    # Origin 2015 9.2xn
+    # Origin 2016 9.3xn
+    # Origin 2017 9.4xn
+    # Origin 2018 >= 9.50n and < 9.55n
+    # Origin 2018b >= 9.55n
+    # Origin 2019 >= 9.60n and < 9.65n (Fall 2019)
+    # Origin 2019b >= 9.65n (Spring 2020)
+except:
+    print('OriginExt not installed, t')
+
 # Ideas for improvements:
 # - Compile line data (labels, format, color) into df
 #   then use df to sort and group lines in origin
@@ -15,7 +29,6 @@ import matplotlib.colors as colors
 def matplotlib_to_origin(
             fig,ax,
             origin=None,project_filename='project.opj',
-            origin_version=2016,
             worksheet_name='Sheet',workbook_name='Book',
             graph_name='Graph',template_name='LINE.otp',
             template_path='OriginTemplates'):
@@ -26,7 +39,7 @@ def matplotlib_to_origin(
     template = origin template name for desired plot, if exists
     templatePath = path on local computer to template folder
     origin = origin session, which is returned from previous calls to this program
-             if passed, a new session will not be created, and graph will be added to 
+             if passed, a new session will not be created, and graph will be added to
              current session
     origin_version = 2016 other year, right now >2016 handles DataRange differently
     '''
@@ -42,7 +55,7 @@ def matplotlib_to_origin(
         # Close previous project and make a new one
         origin.NewProject
         # Wait for origin to compile
-        origin.Execute("sec -poc 3.5") 
+        origin.Execute("sec -poc 3.5")
     # Create a workbook page
     workbook= origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
     # get workbook instance from name
@@ -53,7 +66,7 @@ def matplotlib_to_origin(
     ws.Name=worksheet_name # Set worksheet name
     # For now, assume only x and y data for each line (ignore error data)
     ws.Cols=len(ax.lines)*2 # Set number of columns in worksheet
-    
+
     # Make graph page
     template=os.path.join(template_path,template_name) # Pick template
     graph = origin.CreatePage(3, graph_name, template) # Make a graph with the template
@@ -82,10 +95,10 @@ def matplotlib_to_origin(
         # In the comments row
         if not line.get_label()[0] == '_':
             col.Comments = line.get_label()
-        
+
         origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(line.get_xdata()).tolist(), 0, x_col_idx) # start row, start col
         origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(line.get_ydata()).tolist(), 0, y_col_idx) # start row, start col
-        
+
         # Tested only on origin 2016 and 2018
         if origin_version<=2016:
             dr = origin.NewDataRange # Make a new datarange
@@ -102,13 +115,13 @@ def matplotlib_to_origin(
         # Symbols
         # https://www.originlab.com/doc/LabTalk/ref/List-of-Symbol-Shapes
         # https://www.originlab.com/doc/LabTalk/ref/Options_for_Symbols
-        #0 = no symbol, 1 = square, 2 = circle, 3 = up triangle, 4 = down triangle, 
-        #5 = diamond, 6 = cross (+), 7 = cross (x), 8 = star (*), 9 = bar (-), 10 = bar (|), 
-        # 11 = number, 12 = LETTER, 13 = letter, 14 = right arrow, 15 = left triangle, 
+        #0 = no symbol, 1 = square, 2 = circle, 3 = up triangle, 4 = down triangle,
+        #5 = diamond, 6 = cross (+), 7 = cross (x), 8 = star (*), 9 = bar (-), 10 = bar (|),
+        # 11 = number, 12 = LETTER, 13 = letter, 14 = right arrow, 15 = left triangle,
         #16 = right triangle, 17 = hexagon, 18 = star, 19 = pentagon, 20 = sphere
         # Symbol interior
-        #0 = no symbol, 1 = solid, 2 = open, 3 = dot center, 4 = hollow, 5 = + center, 
-        # 6 = x center, 7 = - center, 8 = | center, 9 = half up, 10 = half right, 
+        #0 = no symbol, 1 = solid, 2 = open, 3 = dot center, 4 = hollow, 5 = + center,
+        # 6 = x center, 7 = - center, 8 = | center, 9 = half up, 10 = half right,
         # 11 = half down, 12 = half left
         # https://matplotlib.org/api/markers_api.html
         mpl_sym_conv = {'s':'1','o':'2','^':'3','v':'4','D':'5','+':'6','x':'7',
@@ -122,7 +135,7 @@ def matplotlib_to_origin(
                 'range rr = !' + str(line_idx+1) + '; ' +
                 'set rr -cl color('+lc+');' + # line color
                 'set rr -w 500*'+str(plt.getp(line,'linewidth'))+';') # line width
-            
+
         #Symbol
         elif plt.getp(line,'linestyle')=='None':
             data_plots.Add(dr,201)
@@ -154,10 +167,10 @@ def matplotlib_to_origin(
                 'set rr -kh 10*'+str(plt.getp(line,'mew'))+';' + # edge width
                 'set rr -cl color('+lc+');' + # line color
                 'set rr -w 500*'+str(plt.getp(line,'linewidth'))+';') # line width
-        
-        
-    
-    # For labtalk documentation of graph formatting, see: 
+
+
+
+    # For labtalk documentation of graph formatting, see:
     # https://www.originlab.com/doc/LabTalk/guide/Formatting-Graphs
     # https://www.originlab.com/doc/LabTalk/ref/Layer-Axis-Label-obj
     # For matplotlib documentation, see:
@@ -182,9 +195,9 @@ def matplotlib_to_origin(
     #graph_layer.Execute('layer.y.label.pt = 12;')
     #graph_layer.Execute('xb.fsize = 16;')
     #graph_layer.Execute('yl.fsize = 16;')
-    
+
     # Axis label number format:
-    # 1 = decimal without commas, 2 = scientific, 
+    # 1 = decimal without commas, 2 = scientific,
     # 3 = engineering, and 4 = decimal with commas (for date).
     # https://www.originlab.com/doc/LabTalk/ref/Layer-Axis-Label-obj
     # Set x-axis properties
@@ -196,7 +209,7 @@ def matplotlib_to_origin(
         graph_layer.Execute('layer.x.type = 2;')
         # Change tick label number type to scientific
         graph_layer.Execute('layer.x.label.numFormat=2')
-    graph_layer.Execute('layer.x.from = ' + str(x_axis_range[0]) + '; ' + 
+    graph_layer.Execute('layer.x.from = ' + str(x_axis_range[0]) + '; ' +
                            'layer.x.to = ' + str(x_axis_range[1]) + ';')
     # Set y-axis properties
     if y_axis_scale == 'linear':
@@ -207,15 +220,15 @@ def matplotlib_to_origin(
         graph_layer.Execute('layer.y.type = 2;')
         # Change tick label number type to scientific
         graph_layer.Execute('layer.y.label.numFormat=2')
-    graph_layer.Execute('layer.y.from = '+str(y_axis_range[0])+'; '+ 
+    graph_layer.Execute('layer.y.from = '+str(y_axis_range[0])+'; '+
                            'layer.y.to = '+str(y_axis_range[1])+';')
-    
+
     # Set page dimensions based on figure size
     # figure_size_inches = fig.get_size_inches()
     # graph_page.Execute('page.width= page.resx*'+str(figure_size_inches[0])+'; '+
                          # 'page.height= page.resy*'+str(figure_size_inches[1])+';')
     # Units 1 = % page, 2 = inches, 3 = cm, 4 = mm, 5 = pixel, 6 = points, and 7 = % of linked layer.
-    # graph_layer.Execute('layer.unit=2; ' + 
+    # graph_layer.Execute('layer.unit=2; ' +
                            # 'layer.width='+str(figure_size_inches[0])+'; '+
                            # 'layer.height='+str(figure_size_inches[1])+';')
     # Group each column (This allows colors to be automatically incremented
