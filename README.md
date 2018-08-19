@@ -24,4 +24,5 @@ OriginLab has fairly spotty documentation, but the two main documentation source
 
 
 ## Other Resources
-https://github.com/swharden/PyOriginTools
+- https://github.com/swharden/PyOriginTools
+- [OriginExt Package](https://pypi.org/project/OriginExt/)
