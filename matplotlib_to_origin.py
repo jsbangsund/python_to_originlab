@@ -32,8 +32,8 @@ def matplotlib_to_origin(
     # If no origin session has been passed, start a new one
     if origin==None:
         # Connect to Origin client
-        # OriginExt.ApplicationSI() connects to current session if exists
-        origin = OriginExt.Application()
+        # OriginExt.Application() forces a new connection
+        origin = OriginExt.ApplicationSI()
         origin.Visible = origin.MAINWND_SHOW # Make session visible
         # Session can be later closed using origin.Exit()
         # Close previous project and make a new one
