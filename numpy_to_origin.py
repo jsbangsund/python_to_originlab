@@ -20,6 +20,7 @@ def numpy_to_origin(
     column_axis = integer (0 or 1) for axis to interpret as worksheet columns
     long_names,comments,units = lists for header rows, length = # of columns
     user_defined = list of (key,value) tuples for metadata for a sheet
+        e.g. [('Test Date','2019-01-01'),('Device Label','A12')]
     origin = origin session, which is returned from previous calls to this program
              if passed, a new session will not be created, and graph will be added to 
              current session
@@ -38,7 +39,7 @@ def numpy_to_origin(
         origin.NewProject
         # Wait for origin to compile
         origin.Execute("sec -poc 3.5")
-        time.sleep(2)
+        time.sleep(5)
         
     # Check if workbook exists. If not create a new workbook page with this name
     layer_idx=None
