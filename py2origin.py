@@ -466,3 +466,21 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
     
     return graphName
     # To exit, call origin.Exit()
+    
+'''
+Miscellaneous methods and commands that could be useful:
+
+Setting and getting height and width of graph page:
+origin.GraphPages(i).Height = 4
+origin.GraphPages(i).Width = 6
+
+Get number of workbooks, pages, etc.
+origin.WorksheetPages.Count
+origin.GraphPages.Count
+etc.
+
+Get the parent workbook of a worksheet
+worksheets[0].Parent.Name
+    This also works to get the parent with graph layers
+(more docs here https://www.originlab.com/doc/COM/Classes/)
+'''
