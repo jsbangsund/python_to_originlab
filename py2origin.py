@@ -30,6 +30,52 @@ def set_axis_scale(graph_layer,axis='x',scale='linear'):
         graph_layer.Execute('layer.'+axis+'.label.numFormat=2')
     return
     
+def get_workbooks(origin):
+    workbooks = []
+    workbook_names = []
+    i = 0
+    while not (origin.WorksheetPages(i) is None):
+        workbooks.append(origin.WorksheetPages(i))
+        workbook_names.append(origin.WorksheetPages(i).Name)
+        i += 1
+    return workbooks,workbook_names
+def get_sheets_from_book(origin,workbooks,max_sheets=100):
+    # origin is the active origin session
+    # workbooks is a COM object, string of the workbook name, 
+        # a list of COM objects, or a list of strings
+    # This can be used to get a list of worksheets which are then passed to 
+    # createGraph_multiwks to create graphs
+    worksheets=[]
+    if isinstance(workbooks,str) or isinstance(workbooks,win32com.client.CDispatch):
+        wb_list = [workbooks]
+    elif isinstance(workbooks,list):
+        wb_list = workbooks
+    else:
+        print('wrong type of workbooks provided. Must be COM object, string or list')
+        return
+    for wb in wb_list:
+        if isinstance(wb,win32com.client.CDispatch):
+            # If a COM object, this is already OK
+            pass
+        elif isinstance(wb,str):
+            # If a string, get workbook from name
+            wb = origin.WorksheetPages(workbook_name)
+        else:
+            print('wrong type of workbook provided. Must be COM object or string')
+        if wb is None:
+            print('workbook does not exist. Check if name is correct')
+        else:
+            i = 0
+            while not (wb.Layers(i) is None):
+                worksheets.append(wb.Layers(i))
+                i+=1
+                if i>max_sheets:
+                    break
+    print('Found ' + str(len(worksheets)) + ' worksheets')
+    return worksheets
+        
+    
+    
 def matplotlib_to_origin(
             fig,ax,
             origin=None,project_filename='project.opj',
