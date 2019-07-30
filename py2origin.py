@@ -6,6 +6,19 @@ import os
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 
+'''
+Useful documentation sources:
+https://www.originlab.com/doc/COM/Classes/ApplicationSI
+    Description of classes and functions available through COM server
+https://www.originlab.com/doc/OriginC/ref/
+    Some overlap with above, but at times provides more specific examples
+    This lists a number of the commands for OriginC
+    These can often be directly translated to python commands
+https://www.originlab.com/doc/LabTalk/ref/
+    LabTalk commands often allow more specific/particular operations
+    e.g. changing axis scales, font sizes, etc.
+'''
+
 # Ideas for improvements:
 # - Compile line data (labels, format, color) into df
 #   then use df to sort and group lines in origin
@@ -29,17 +42,30 @@ def set_axis_scale(graph_layer,axis='x',scale='linear'):
         # Change tick label number type to scientific
         graph_layer.Execute('layer.'+axis+'.label.numFormat=2')
     return
-    
+def get_graphpages(origin):
+    graphpages = []
+    graphnames = []
+    for gp in origin.GraphPages:
+        graphpages.append(gp)
+        graphnames.append(gp.Name)
+    return graphpages,graphnames
 def get_workbooks(origin):
     workbooks = []
     workbook_names = []
-    i = 0
-    while not (origin.WorksheetPages(i) is None):
-        workbooks.append(origin.WorksheetPages(i))
-        workbook_names.append(origin.WorksheetPages(i).Name)
-        i += 1
+    for wb in origin.WorksheetPages:
+        workbooks.append(wb)
+        workbook_names.append(wb.Name)
     return workbooks,workbook_names
-def get_sheets_from_book(origin,workbooks,max_sheets=100):
+def get_all_sheets(origin):
+    worksheets=[]
+    worksheet_names=[]
+    for wb in origin.WorksheetPages:
+        for ws in wb.Layers:
+            worksheets.append(ws)
+            worksheet_names.append(ws.Name)
+    print('Found ' + str(len(worksheets)) + ' worksheets')
+    return worksheets,worksheet_names
+def get_sheets_from_book(origin,workbooks):
     # origin is the active origin session
     # workbooks is a COM object, string of the workbook name, 
         # a list of COM objects, or a list of strings
@@ -65,16 +91,10 @@ def get_sheets_from_book(origin,workbooks,max_sheets=100):
         if wb is None:
             print('workbook does not exist. Check if name is correct')
         else:
-            i = 0
-            while not (wb.Layers(i) is None):
-                worksheets.append(wb.Layers(i))
-                i+=1
-                if i>max_sheets:
-                    break
+            for ws in wb.Layers:
+                worksheets.append(ws)
     print('Found ' + str(len(worksheets)) + ' worksheets')
     return worksheets
-        
-    
     
 def matplotlib_to_origin(
             fig,ax,
@@ -323,10 +343,7 @@ def numpy_to_origin(
     if layer_idx is None:
         wb.Layers.Add() # Add a worksheet
         #then find the last worksheet to modify (to avoid overwriting other data)
-        i = 0
-        while not (wb.Layers(i) is None):
-            i+=1
-        layer_idx = i-1
+        layer_idx = wb.Layers.Count - 1
     ws=wb.Layers(layer_idx) # Get worksheet instance, index starts at 0.
     ws.Name=worksheet_name # Set worksheet name
     # For now, assume only x and y data for each line (ignore error data)
