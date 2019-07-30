@@ -84,12 +84,21 @@ def numpy_to_origin(
         origin.Execute('wks.col1.width=10;')
     return origin,wb,ws
     
-def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,LineOrSym,
-                       origin_version=2018):
-    # worksheets must be a list of worksheets
-    # template is the full path and template filename
-    # Each worksheet must be formatted identically
-    # x_col, y_col, and LineOrSym should be same length
+def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,
+                       LineOrSym=None,origin_version=2018,auto_rescale=True,
+                       x_scale=None,y_scale=None,x_label=None,y_label=None):
+    '''
+    worksheets must be a list of worksheets
+        Each worksheet must have same order of columns
+    template is the full path and template filename
+    x_cols, y_cols, and LineOrSym should be lists of same length
+        each element of list is a different variable/column to plot
+        x_col can be a single element list or an integer, and then the same value of x_col
+        will be applied to every y_col
+    auto_rescale is a bool. If true, axes scales will automatically re-scales
+    x_scale, y_scale can be None (use origin default), "linear" or "log"
+    x_label, y_label can be None (use template default) or string
+    '''
     # Create graph page and object
     templateFullPath=os.path.join(templatePath,template)
     # Create graph if doesn't already exist
@@ -98,7 +107,19 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
         graphName = origin.CreatePage(3, graphName, templateFullPath)
         # Find the graph layer
         graphLayer = origin.FindGraphLayer(graphName)
-
+    # Check length of x_cols and y_cols
+    if isinstance(x_cols, list) and isinstance(y_cols, list):
+        if not len(x_cols)==len(y_cols):
+            print('length of x_cols != length of y_cols. Assuming same x_col for all y_cols')
+            x_cols = [x_cols[0]]*len(y_cols)
+    # if integer provided for x_cols but list for y_cols, assume same x_cols for all y_cols
+    elif isinstance(x_cols, int) and isinstance(y_cols, list):
+        x_cols = [x_cols]*len(y_cols)
+    elif isinstance(x_cols, int) and isinstance(y_cols, int):
+        x_cols,y_cols = [x_cols],[y_cols] # convert to lists
+    # If LineOrSym not provided, assume line
+    if LineOrSym is None:
+        LineOrSym = ['Line']*len(y_cols)
     # Get dataplot collection from the graph layer
     dataPlots = graphLayer.DataPlots
 
@@ -139,7 +160,31 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
     # Rescales axes
     #Rescale type: 1 = manual, 2 = normal, 3 = auto, 4 = fixed from, and 5 = fixed to.
     #graphLayer.invoke('Execute','layer.axis.rescale=3');
-    graphLayer.Execute('Rescale')
+    if auto_rescale:
+        graphLayer.Execute('Rescale')
     graphLayer.Execute('legend -r')
+    
+    # Axis label number format:
+    # 1 = decimal without commas, 2 = scientific, 
+    # 3 = engineering, and 4 = decimal with commas (for date).
+    # https://www.originlab.com/doc/LabTalk/ref/Layer-Axis-Label-obj
+    # Set x-axis properties
+    if x_scale == 'linear':
+        graph_layer.Execute('layer.x.type = 0;')
+        # Change number format to decimal
+        graph_layer.Execute('layer.x.label.numFormat=1')
+    elif x_scale == 'log':
+        graph_layer.Execute('layer.x.type = 2;')
+        # Change tick label number type to scientific
+        graph_layer.Execute('layer.x.label.numFormat=2')
+    # Set y-axis properties
+    if y_scale == 'linear':
+        graph_layer.Execute('layer.y.type = 0;')
+        # Change tick label number type to decimal
+        graph_layer.Execute('layer.y.label.numFormat=1')
+    elif y_scale == 'log':
+        graph_layer.Execute('layer.y.type = 2;')
+        # Change tick label number type to scientific
+        graph_layer.Execute('layer.y.label.numFormat=2')
     return graphName
     # To exit, call origin.Exit()
