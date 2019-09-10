@@ -299,9 +299,7 @@ def numpy_to_origin(
     user_defined=None,
     origin=None,project_filename='project.opj',
     origin_version=2018,
-    worksheet_name='Sheet',workbook_name='Book',
-    graph_name='Graph',template_name='LINE.otp',
-    template_path='OriginTemplates'):
+    worksheet_name='Sheet',workbook_name='Book'):
     '''
     Sends 2d numpy array to originlab worksheet
     Inputs:
@@ -325,7 +323,7 @@ def numpy_to_origin(
         origin.Visible=1
         # Session can be later closed using origin.Exit()
         # Close previous project and make a new one
-        origin.NewProject
+        #origin.NewProject
         # Wait for origin to compile
         origin.Execute("sec -poc 3.5")
         time.sleep(5)
@@ -360,7 +358,19 @@ def numpy_to_origin(
         if not (types is None) and (len(types)>col_idx):
             # Set column data type to ( 0=Y, 3=X , ?=X error, ?=Y error)
             col.Type=types[col_idx]
-        origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(data_array[col_idx,:]).tolist(), 0, col_idx) # start row, start col
+        # Check dimensionality off array.
+        # If one dimensional, each element is assumed to be a column
+        # If two dimensional, check
+        # other dimensions are not supported.
+        if data_array.ndim == 2:
+            if column_axis == 0:
+                origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(data_array[col_idx,:]).tolist(), 0, col_idx) # start row, start col
+            elif column_axis == 1:
+                origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(data_array[:,col_idx]).tolist(), 0, col_idx) # start row, start col
+        elif data_array.ndim == 1:
+            origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(data_array[col_idx]).tolist(), 0, col_idx) # start row, start col
+        else:
+            print('only 1 and 2 dimensional arrays supported')
     #origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(data_array).T.tolist(), 0, col_idx) # start row, start col
     if not user_defined is None:
         # User Param Rows
