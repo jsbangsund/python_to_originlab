@@ -312,6 +312,7 @@ def numpy_to_origin(
              if passed, a new session will not be created, and graph will be added to 
              current session
     origin_version = 2016 other year, right now >2016 handles DataRange differently
+    types = column types, either 'x','y','x_err','y_err','z','label', or 'ignore'
     '''
     # If no origin session has been passed, start a new one
     if origin is None:
@@ -356,8 +357,10 @@ def numpy_to_origin(
         if (not comments is None) and (len(comments)>col_idx):
             col.Comments=comments[col_idx]
         if not (types is None) and (len(types)>col_idx):
-            # Set column data type to ( 0=Y, 3=X , ?=X error, ?=Y error)
-            col.Type=types[col_idx]
+            type_str_to_int={'x':3,'y':0,'x_err':6,'y_err':2,'label':4,'z':5,'ignore':1}
+            # Set column data type to (0 = Y, 1 = disregard, 2 = Y Error, 3 = X, 4 = Label, 5 = Z, and 6 = X Error.)
+            # documentation here is off by one  https://www.originlab.com/doc/LabTalk/ref/Wks-Col-obj
+            col.Type=type_str_to_int[types[col_idx].lower()]
         # Check dimensionality off array.
         # If one dimensional, each element is assumed to be a column
         # If two dimensional, check
