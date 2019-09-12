@@ -232,7 +232,7 @@ def matplotlib_to_origin(
                 'range rr = !' + str(line_idx+1) + '; ' +
                 'set rr -k '+mpl_sym_conv[plt.getp(line,'marker')]+';' + # symbol type
                 'set rr -kf 2;' + # symbol interior
-                'set rr -z '+str(plt.getp(line,'ms'))+');' + # symbol size
+                'set rr -z '+str(plt.getp(line,'ms'))+';' + # symbol size
                 'set rr -c color('+mec+');'+ # edge color
                 'set rr -cf color('+mfc+');'+ # face color
                 'set rr -kh 10*'+str(plt.getp(line,'mew'))+';' + # edge width
