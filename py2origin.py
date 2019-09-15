@@ -122,10 +122,14 @@ def get_origin_version(origin):
     # Origin 2019b >= 9.65n (Spring 2020)
     return origin.GetLTVar("@V")
     
+def save_project(origin,project_name,full_path):
+    # File ending is automatically added by origin
+    project_name = project_name.replace('.opju','').replace('.opj','')
+    origin.Execute("save " + os.path.join(full_path,project_name))
+    
 def matplotlib_to_origin(
             fig,ax,
-            origin=None,project_filename='project.opj',
-            origin_version=2016,
+            origin=None,
             worksheet_name='Sheet',workbook_name='Book',
             graph_name='Graph',template_name='LINE.otp',
             template_path='OriginTemplates'):
@@ -312,8 +316,7 @@ def matplotlib_to_origin(
 def numpy_to_origin(
     data_array,column_axis=0,types=None,
     long_names=None,comments=None,units=None,
-    user_defined=None,
-    origin=None,project_filename='project.opj',
+    user_defined=None,origin=None,
     worksheet_name='Sheet',workbook_name='Book'):
     '''
     Sends 2d numpy array to originlab worksheet
@@ -354,6 +357,7 @@ def numpy_to_origin(
     # Change column Units, Long Name, or Comments]
     for col_idx in range(0,data_array.shape[column_axis]):
         col=ws.Columns(col_idx) # Get column instance, index starts at 0
+        # Go through, check that each value exists and add to worksheet
         if (not long_names is None) and (len(long_names)>col_idx):
             col.LongName=long_names[col_idx]
         if (not units is None) and (len(units)>col_idx):
