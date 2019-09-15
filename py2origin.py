@@ -5,6 +5,7 @@ import win32com.client
 import os
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
+import OriginExt
 
 '''
 Useful documentation sources:
@@ -96,6 +97,31 @@ def get_sheets_from_book(origin,workbooks):
     print('Found ' + str(len(worksheets)) + ' worksheets')
     return worksheets
     
+def connect_to_origin():
+    # Connect to Origin client
+    # OriginExt.Application() forces a new connection
+    origin = OriginExt.ApplicationSI()
+    origin.Visible = origin.MAINWND_SHOW # Make session visible
+    # Session can be later closed using origin.Exit()
+    # Close previous project and make a new one
+    # origin.NewProject()
+    # Wait for origin to compile
+    # https://www.originlab.com/doc/LabTalk/ref/Second-cmd#-poc.3B_Pause_up_to_the_specified_number_of_seconds_to_wait_for_Origin_OC_startup_compiling_to_finish
+    origin.Execute("sec -poc 3.5")
+    time.sleep(3.5)
+    return origin
+    
+def get_origin_version(origin):
+    # Get origin version
+    # Origin 2015 9.2xn
+    # Origin 2016 9.3xn
+    # Origin 2017 9.4xn
+    # Origin 2018 >= 9.50n and < 9.55n
+    # Origin 2018b >= 9.55n
+    # Origin 2019 >= 9.60n and < 9.65n (Fall 2019)
+    # Origin 2019b >= 9.65n (Spring 2020)
+    return origin.GetLTVar("@V")
+    
 def matplotlib_to_origin(
             fig,ax,
             origin=None,project_filename='project.opj',
@@ -112,21 +138,11 @@ def matplotlib_to_origin(
     origin = origin session, which is returned from previous calls to this program
              if passed, a new session will not be created, and graph will be added to 
              current session
-    origin_version = 2016 other year, right now >2016 handles DataRange differently
     '''
     # If no origin session has been passed, start a new one
     if origin==None:
-        # Connect to Origin client
-        origin = win32com.client.Dispatch("Origin.ApplicationSI")
-        # To open a new origin session (not overlap on current open session use:
-        # origin = win32com.client.Dispatch("Origin.Application")
-        # Make session visible
-        origin.Visible=1
-        # Session can be later closed using origin.Exit()
-        # Close previous project and make a new one
-        origin.NewProject
-        # Wait for origin to compile
-        origin.Execute("sec -poc 3.5") 
+        origin = connect_to_origin()
+    origin_version = get_origin_version(origin)
     # Create a workbook page
     workbook= origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
     # get workbook instance from name
@@ -171,9 +187,9 @@ def matplotlib_to_origin(
         origin.PutWorksheet('['+wb.Name+']'+ws.Name, np.float64(line.get_ydata()).tolist(), 0, y_col_idx) # start row, start col
         
         # Tested only on origin 2016 and 2018
-        if origin_version<=2016:
+        if origin_version<9.5: # 2016 or earlier
             dr = origin.NewDataRange # Make a new datarange
-        elif origin_version>2016:
+        elif origin_version>=9.50: # 2018 or later
             dr = origin.NewDataRange()
         # Add data to data range
         # Column type, worksheet, start row, start col, end row (-1=last), end col
@@ -298,7 +314,6 @@ def numpy_to_origin(
     long_names=None,comments=None,units=None,
     user_defined=None,
     origin=None,project_filename='project.opj',
-    origin_version=2018,
     worksheet_name='Sheet',workbook_name='Book'):
     '''
     Sends 2d numpy array to originlab worksheet
@@ -315,20 +330,9 @@ def numpy_to_origin(
     types = column types, either 'x','y','x_err','y_err','z','label', or 'ignore'
     '''
     # If no origin session has been passed, start a new one
-    if origin is None:
-        # Connect to Origin client
-        origin = win32com.client.Dispatch("Origin.ApplicationSI")
-        # To open a new origin session (not overlap on current open session use:
-        # origin = win32com.client.Dispatch("Origin.Application")
-        # Make session visible
-        origin.Visible=1
-        # Session can be later closed using origin.Exit()
-        # Close previous project and make a new one
-        #origin.NewProject
-        # Wait for origin to compile
-        origin.Execute("sec -poc 3.5")
-        time.sleep(5)
-        
+    if origin==None:
+        origin = connect_to_origin()
+    origin_version = get_origin_version(origin)
     # Check if workbook exists. If not create a new workbook page with this name
     layer_idx=None
     if origin.WorksheetPages(workbook_name) is None:
