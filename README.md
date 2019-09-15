@@ -7,6 +7,8 @@ The function matplotlib_to_origin will try it's best to convert a matplotlib fig
 
 ## Dependencies
 OriginLab must be installed, and must have the win32com python package (https://anaconda.org/anaconda/pywin32).
+[OriginExt](https://pypi.org/project/OriginExt/#description) is also used, and can be installed with:
+`pip install originext`
 
 ## Other notes
 Origin color increment lists (.oth files) follow the color series in https://jiffyclub.github.io/palettable/, and can be found in the folder "\OriginTemplates\Themes\Graph".
