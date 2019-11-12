@@ -339,8 +339,6 @@ def numpy_to_origin(
     # Check if workbook exists. If not create a new workbook page with this name
     layer_idx=None
     if origin.WorksheetPages(workbook_name) is None:
-        print(workbook_name)
-        print(origin.WorksheetPages(workbook_name))
         workbook_name = origin.CreatePage(2, workbook_name , 'Origin') # 2 for workbook
         # Use Sheet1 if workbook is newly made
         layer_idx=0
