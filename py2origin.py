@@ -219,7 +219,7 @@ def matplotlib_to_origin(
                                     '*':'8','_':'9','|':'10','h':'17','p':'19'}
         #Line
         if plt.getp(line,'marker')=='None':
-            data_plots.Add(dr,200)
+            graph_layer.AddPlot(dr,200)
             lc = colors.to_hex(plt.getp(line,'color'))
             # Set line color and line width
             graph_layer.Execute(
@@ -229,7 +229,7 @@ def matplotlib_to_origin(
             
         #Symbol
         elif plt.getp(line,'linestyle')=='None':
-            data_plots.Add(dr,201)
+            graph_layer.AddPlot(dr,201) # Previously data_plots.Add()
             # Set symbol size, edge color, face color
             mec = colors.to_hex(plt.getp(line,'mec'))
             mfc = colors.to_hex(plt.getp(line,'mfc'))
@@ -243,7 +243,7 @@ def matplotlib_to_origin(
                 'set rr -kh 10*'+str(plt.getp(line,'mew'))+';')# edge width
         #Line+Symbol
         else:
-            data_plots.Add(dr,202)
+            graph_layer.AddPlot(dr,202)
             # Set symbol size, edge color, face color
             lc = colors.to_hex(plt.getp(line,'color'))
             mec = colors.to_hex(plt.getp(line,'mec'))
@@ -390,7 +390,7 @@ def numpy_to_origin(
     return origin,wb,ws
     
 def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,
-                       LineOrSym=None,origin_version=2018,auto_rescale=True,
+                       LineOrSym=None,auto_rescale=True,
                        x_scale=None,y_scale=None,x_label=None,y_label=None):
     '''
     worksheets must be a list of worksheets
@@ -404,6 +404,7 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
     x_scale, y_scale can be None (use origin default), "linear" or "log"
     x_label, y_label can be None (use template default) or string
     '''
+    origin_version = get_origin_version(origin)
     # Create graph page and object
     templateFullPath=os.path.join(templatePath,template)
     # Create graph if doesn't already exist
@@ -437,27 +438,32 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
         for wi,worksheet in enumerate(worksheets):
             # Create a data range
             # Tested only on origin 2016 and 2018
-            if origin_version<=2016:
+            if origin_version<9.5: # 2016 or earlier
                 dr = origin.NewDataRange # Make a new datarange
-            elif origin_version>2016:
+            elif origin_version>=9.50: # 2018 or later
                 dr = origin.NewDataRange()
             
             # Add data to data range
             #                  worksheet, start row, start col, end row (-1=last), end col
             dr.Add('X', worksheet, 0 , x_col,       -1, x_col)
             dr.Add('Y', worksheet, 0 , y_cols[ci], -1, y_cols[ci])
-            # Add data plot to graph layer
+            # Add data plot to graph layer 
+            # list of types: https://www.originlab.com/doc/LabTalk/ref/Plot-Type-IDs
             # 200 -- line
             # 201 -- symbol
             # 202 -- symbol+line
             # If specified, plot symbol. By default, plot line
+            # https://www.originlab.com/doc/python/PyOrigin/Classes/GraphLayer-AddPlot
             if LineOrSym[ci] in ['Sym','Symbol','Symbols']:
-                dataPlots.Add(dr, 201)
+                graphLayer.AddPlot(dr, 201)
+                # Method when using win32com to connect
+                #dataPlots.Add(dr, 201)
             elif LineOrSym[ci] == 'Line+Sym':
-                dataPlots.Add(dr,202)
+                graphLayer.AddPlot(dr,202)
+                #dataPlots.Add(dr, 202)
             else:
-                dataPlots.Add(dr, 200)
-
+                graphLayer.AddPlot(dr, 200)
+                #dataPlots.Add(dr, 200)
         # Group each column (This allows colors to be automatically incremented
         # and a single legend entry to be created for all the data sets with
         # the same legend entry)
