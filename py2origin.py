@@ -298,7 +298,9 @@ def matplotlib_to_origin(
                            'layer.y.to = '+str(y_axis_range[1])+';')
     
     # Set page dimensions based on figure size
-    # figure_size_inches = fig.get_size_inches()
+    figure_size_inches = fig.get_size_inches()
+    graph_page.SetWidth(figure_size_inches[0])
+    graph_page.SetHeight(figure_size_inches[1])
     # graph_page.Execute('page.width= page.resx*'+str(figure_size_inches[0])+'; '+
                          # 'page.height= page.resy*'+str(figure_size_inches[1])+';')
     # Units 1 = % page, 2 = inches, 3 = cm, 4 = mm, 5 = pixel, 6 = points, and 7 = % of linked layer.
@@ -389,9 +391,10 @@ def numpy_to_origin(
         origin.Execute('wks.col1.width=10;')
     return origin,wb,ws
     
-def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,
+def createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,
                        LineOrSym=None,auto_rescale=True,
-                       x_scale=None,y_scale=None,x_label=None,y_label=None):
+                       x_scale=None,y_scale=None,x_label=None,y_label=None,
+                       figsize=None):
     '''
     worksheets must be a list of worksheets
         Each worksheet must have same order of columns
@@ -408,11 +411,11 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
     # Create graph page and object
     templateFullPath=os.path.join(templatePath,template)
     # Create graph if doesn't already exist
-    graphLayer = origin.FindGraphLayer(graphName)
-    if graphLayer is None:
+    graph_layer = origin.FindGraphLayer(graphName)
+    if graph_layer is None:
         graphName = origin.CreatePage(3, graphName, templateFullPath)
         # Find the graph layer
-        graphLayer = origin.FindGraphLayer(graphName)
+        graph_layer = origin.FindGraphLayer(graphName)
     # Check length of x_cols and y_cols
     if isinstance(x_cols, list) and isinstance(y_cols, list):
         if not len(x_cols)==len(y_cols):
@@ -429,7 +432,7 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
     elif isinstance(LineOrSym, str):
         LineOrSym = [LineOrSym]*len(y_cols)
     # Get dataplot collection from the graph layer
-    dataPlots = graphLayer.DataPlots
+    dataPlots = graph_layer.DataPlots
 
     # Add data column by column to the graph
     # loop over worksheets within column loops so that data from same column
@@ -455,40 +458,42 @@ def  createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_co
             # If specified, plot symbol. By default, plot line
             # https://www.originlab.com/doc/python/PyOrigin/Classes/GraphLayer-AddPlot
             if LineOrSym[ci] in ['Sym','Symbol','Symbols']:
-                graphLayer.AddPlot(dr, 201)
+                graph_layer.AddPlot(dr, 201)
                 # Method when using win32com to connect
                 #dataPlots.Add(dr, 201)
             elif LineOrSym[ci] == 'Line+Sym':
-                graphLayer.AddPlot(dr,202)
+                graph_layer.AddPlot(dr,202)
                 #dataPlots.Add(dr, 202)
             else:
-                graphLayer.AddPlot(dr, 200)
+                graph_layer.AddPlot(dr, 200)
                 #dataPlots.Add(dr, 200)
         # Group each column (This allows colors to be automatically incremented
         # and a single legend entry to be created for all the data sets with
         # the same legend entry)
         BeginIndex = ci*len(worksheets) + 1;
         EndIndex = BeginIndex + len(worksheets) - 1;
-        graphLayer.Execute('layer -g ' + str(BeginIndex) + ' ' + str(EndIndex) + ';')
+        graph_layer.Execute('layer -g ' + str(BeginIndex) + ' ' + str(EndIndex) + ';')
     
-    graphLayer.Execute('legend -r')
+    graph_layer.Execute('legend -r')
     
     # Set axes scales
-    set_axis_scale(graphLayer,axis='x',scale=x_scale)
-    set_axis_scale(graphLayer,axis='y',scale=y_scale)
+    set_axis_scale(graph_layer,axis='x',scale=x_scale)
+    set_axis_scale(graph_layer,axis='y',scale=y_scale)
     
     # Set axes titles (xb for bottom axis, yl for left y-axis, etc.)
     if not x_label is None:
-        graphLayer.Execute('label -xb ' + x_label + ';')
+        graph_layer.Execute('label -xb ' + x_label + ';')
     if not y_label is None:
-        graphLayer.Execute('label -yl ' + y_label + ';')
+        graph_layer.Execute('label -yl ' + y_label + ';')
     
     # Rescales axes
     #Rescale type: 1 = manual, 2 = normal, 3 = auto, 4 = fixed from, and 5 = fixed to.
-    #graphLayer.Execute('layer.axis.rescale=3')
+    #graph_layer.Execute('layer.axis.rescale=3')
     if auto_rescale:
-        graphLayer.Execute('Rescale')
-    
+        graph_layer.Execute('Rescale')
+    # Set figure size in inches
+    graph_page.SetWidth(figsize[0])
+    graph_page.SetHeight(figsize[1])
     return graphName
     # To exit, call origin.Exit()
     
