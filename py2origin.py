@@ -391,7 +391,7 @@ def numpy_to_origin(
         origin.Execute('wks.col1.width=10;')
     return origin,wb,ws
     
-def createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_cols,y_cols,
+def createGraph_multiwks(origin,graph_name,template,templatePath,worksheets,x_cols,y_cols,
                        LineOrSym=None,auto_rescale=True,
                        x_scale=None,y_scale=None,x_label=None,y_label=None,
                        figsize=None):
@@ -411,11 +411,11 @@ def createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_col
     # Create graph page and object
     templateFullPath=os.path.join(templatePath,template)
     # Create graph if doesn't already exist
-    graph_layer = origin.FindGraphLayer(graphName)
+    graph_layer = origin.FindGraphLayer(graph_name)
     if graph_layer is None:
-        graphName = origin.CreatePage(3, graphName, templateFullPath)
+        graph_name = origin.CreatePage(3, graph_name, templateFullPath)
         # Find the graph layer
-        graph_layer = origin.FindGraphLayer(graphName)
+        graph_layer = origin.FindGraphLayer(graph_name)
     # Check length of x_cols and y_cols
     if isinstance(x_cols, list) and isinstance(y_cols, list):
         if not len(x_cols)==len(y_cols):
@@ -491,11 +491,19 @@ def createGraph_multiwks(origin,graphName,template,templatePath,worksheets,x_col
     #graph_layer.Execute('layer.axis.rescale=3')
     if auto_rescale:
         graph_layer.Execute('Rescale')
-    # Set figure size in inches
-    graph_page.SetWidth(figsize[0])
-    graph_page.SetHeight(figsize[1])
-    return graphName
+    if not figsize is None:
+        graph_page.SetWidth(figsize[0])
+        graph_page.SetHeight(figsize[1])
+    return graph_name
     # To exit, call origin.Exit()
+    
+# Could try to format from standard matplotlib keyword arguments, such as:
+# figsize, markersize
+# def format_from_mpl_kwargs(graph_page,graph_layer,**kwargs):
+    # # Set figure size in inches
+    # if figsize in kwargs.keys():
+        # graph_page.SetWidth(figsize[0])
+        # graph_page.SetHeight(figsize[1])
     
 '''
 Miscellaneous methods and commands that could be useful:
